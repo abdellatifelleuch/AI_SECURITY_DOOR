@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reconnaissance Faciale — Établissement</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Inter',sans-serif;background:#f0f4f8;color:#1a2340;overflow:hidden;height:100vh;width:100vw;-webkit-font-smoothing:antialiased;}
+:root{
+--w:#ffffff;--navy:#0f1d3a;--navy2:#1b2e5c;
+--blue:#1d4ed8;--blue2:#3b82f6;--blue3:#dbeafe;--blue4:#eff6ff;
+--gold:#a16207;--gold2:#ca8a04;--gold3:#fef9c3;--gold4:#fffbeb;
+--teal:#0f766e;--teal3:#ccfbf1;
+--green:#15803d;--green3:#dcfce7;
+--red:#b91c1c;--red3:#fee2e2;
+--purple:#7c3aed;--purple3:#ede9fe;
+--orange:#c2410c;--orange3:#ffedd5;
+--g:#64748b;--g2:#94a3b8;--g3:#cbd5e1;--g4:#e2e8f0;--g5:#f1f5f9;
+--sh:0 1px 3px rgba(0,0,0,0.05),0 4px 16px rgba(0,0,0,0.04);
+--sh2:0 8px 30px rgba(0,0,0,0.08);
+}
+.P{width:100vw;height:100vh;position:relative;}
+.s{position:absolute;top:0;left:0;width:100%;height:100%;opacity:0;pointer-events:none;display:flex;flex-direction:column;overflow-y:auto;transition:opacity .45s ease,transform .45s ease;transform:translateX(40px);}
+.s.active{opacity:1;pointer-events:all;transform:translateX(0);}
+.blob{position:absolute;border-radius:50%;filter:blur(90px);z-index:0;animation:bf 10s ease-in-out infinite alternate;}
+@keyframes bf{0%{transform:translate(0,0) scale(1);}50%{transform:translate(20px,-15px) scale(1.08);}100%{transform:translate(-10px,10px) scale(.95);}}
+.sl{position:relative;z-index:2;padding:28px 44px 60px;height:100%;display:flex;flex-direction:column;}
+.top{display:flex;justify-content:space-between;align-items:center;padding-bottom:10px;border-bottom:2px solid var(--g4);margin-bottom:12px;}
+.top .logo{font-size:11px;font-weight:800;color:var(--navy);letter-spacing:2.5px;text-transform:uppercase;display:flex;align-items:center;gap:8px;}
+.top .logo .ld{width:9px;height:9px;border-radius:50%;background:linear-gradient(135deg,var(--gold2),var(--blue2));}
+.top .tag{font-size:10px;font-weight:700;color:var(--g);letter-spacing:1.5px;text-transform:uppercase;background:var(--g5);padding:5px 14px;border-radius:20px;}
+.body{flex:1;display:flex;flex-direction:column;justify-content:center;}
+.s.active .a{animation:su .55s ease both;}
+.s.active .a1{animation-delay:.08s;}.s.active .a2{animation-delay:.16s;}.s.active .a3{animation-delay:.24s;}.s.active .a4{animation-delay:.32s;}.s.active .a5{animation-delay:.40s;}.s.active .a6{animation-delay:.48s;}.s.active .a7{animation-delay:.56s;}
+@keyframes su{from{opacity:0;transform:translateY(28px);}to{opacity:1;transform:translateY(0);}}
+@keyframes si{from{opacity:0;transform:scale(.92);}to{opacity:1;transform:scale(1);}}
+@keyframes pulse{0%,100%{transform:scale(1);opacity:.6;}50%{transform:scale(1.08);opacity:1;}}
+@keyframes scan{0%,100%{top:8%;}50%{top:88%;}}
+@keyframes dash{to{stroke-dashoffset:0;}}
+@keyframes float{0%,100%{transform:translateY(0);}50%{transform:translateY(-6px);}}
+@keyframes glow{0%,100%{box-shadow:0 0 0 0 rgba(29,78,216,0);}50%{box-shadow:0 0 0 8px rgba(29,78,216,0.08);}}
+@keyframes walkIn{0%{transform:translateX(-60px);opacity:0;}100%{transform:translateX(0);opacity:1;}}
+@keyframes scanBeam{0%{transform:scaleX(0);opacity:0;}30%{transform:scaleX(1);opacity:1;}70%{transform:scaleX(1);opacity:1;}100%{transform:scaleX(0);opacity:0;}}
+@keyframes checkPop{0%{transform:scale(0);opacity:0;}60%{transform:scale(1.3);opacity:1;}100%{transform:scale(1);opacity:1;}}
+@keyframes gateOpen{0%{transform:scaleX(1);}100%{transform:scaleX(0);}}
+@keyframes flowPulse{0%,100%{opacity:.3;}50%{opacity:1;}}
+@keyframes dataFlow{0%{stroke-dashoffset:20;}100%{stroke-dashoffset:0;}}
+@keyframes rotate{0%{transform:rotate(0deg);}100%{transform:rotate(360deg);}}
+
+.lbl{font-size:11px;font-weight:800;letter-spacing:3px;text-transform:uppercase;color:var(--blue);margin-bottom:6px;}
+.lbl .num{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:6px;background:var(--blue3);color:var(--blue);font-size:11px;font-weight:900;margin-right:8px;}
+h1{font-size:clamp(28px,4.5vw,52px);font-weight:900;color:var(--navy);line-height:1.06;margin-bottom:12px;}
+h2{font-size:clamp(20px,2.8vw,36px);font-weight:800;color:var(--navy);line-height:1.1;margin-bottom:8px;}
+h3{font-size:14px;font-weight:700;color:var(--navy);margin-bottom:4px;}
+.desc{font-size:14px;color:var(--g);line-height:1.7;max-width:640px;margin-bottom:18px;}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;}
+.g4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px;}
+.c{background:var(--w);border:1px solid var(--g4);border-radius:14px;padding:18px;box-shadow:var(--sh);transition:all .3s;overflow:hidden;}
+.c:hover{transform:translateY(-3px);box-shadow:var(--sh2);}
+.c p{font-size:12px;color:var(--g);line-height:1.55;}
+.ci{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;margin-bottom:10px;}
+.ci-b{background:var(--blue3);}.ci-g{background:var(--gold3);}.ci-gn{background:var(--green3);}.ci-r{background:var(--red3);}.ci-p{background:var(--purple3);}.ci-t{background:var(--teal3);}.ci-o{background:var(--orange3);}
+.stats{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;}
+.st{background:var(--w);border:1px solid var(--g4);border-radius:12px;padding:14px 18px;text-align:center;flex:1;min-width:100px;box-shadow:var(--sh);}
+.st .sv{font-size:28px;font-weight:900;}.st .sl2{font-size:9px;color:var(--g2);margin-top:2px;font-weight:600;}
+.split{display:flex;gap:16px;align-items:flex-start;}.spl{flex:1.1;}.spr{flex:.9;}
+.n{border-radius:12px;padding:12px 16px;margin-top:10px;}.n p{font-size:12px;line-height:1.55;color:var(--g);}
+.nb{background:var(--blue4);border-left:4px solid var(--blue);}.nb b{color:var(--blue);}
+.ng{background:var(--gold4);border-left:4px solid var(--gold2);}.ng b{color:var(--gold);}
+.nr{background:var(--red3);border-left:4px solid var(--red);}.nr b{color:var(--red);}
+.ngn{background:var(--green3);border-left:4px solid var(--green);}.ngn b{color:var(--green);}
+.np{background:var(--purple3);border-left:4px solid var(--purple);}.np b{color:var(--purple);}
+.no{background:var(--orange3);border-left:4px solid var(--orange);}.no b{color:var(--orange);}
+.diag{background:var(--w);border:1px solid var(--g4);border-radius:14px;padding:12px;box-shadow:var(--sh);}
+.diag svg{width:100%;height:auto;display:block;}
+.pipe{display:flex;align-items:stretch;gap:4px;}.pb{flex:1;background:var(--w);border:1px solid var(--g4);border-radius:12px;padding:12px 8px;text-align:center;box-shadow:var(--sh);}
+.pb .pe{font-size:24px;margin-bottom:4px;display:block;}.pb .pt{font-size:11px;font-weight:700;color:var(--navy);margin-bottom:2px;}.pb .pd{font-size:9px;color:var(--g2);line-height:1.3;}
+.pa{display:flex;align-items:center;color:var(--blue2);font-size:16px;flex-shrink:0;animation:pulse 2s ease-in-out infinite;}
+.vs-row{display:flex;gap:14px;align-items:stretch;}
+.vs-box{flex:1;border-radius:14px;padding:20px;text-align:center;overflow:hidden;}
+.vs-bad{background:linear-gradient(135deg,#fef2f2,#fee2e2);border:2px solid #fecaca;}
+.vs-good{background:linear-gradient(135deg,#f0fdf4,#dcfce7);border:2px solid #bbf7d0;}
+.vs-box .vi{font-size:42px;margin-bottom:8px;display:block;}
+.vs-bad h3{color:var(--red);font-size:15px;margin-bottom:5px;}.vs-good h3{color:var(--green);font-size:15px;margin-bottom:5px;}
+.vs-box p{font-size:11px;color:var(--g);line-height:1.5;}
+.tbl{width:100%;border-collapse:collapse;font-size:11px;background:var(--w);border-radius:12px;overflow:hidden;box-shadow:var(--sh);}
+.tbl th{background:var(--navy);padding:10px 12px;text-align:left;font-size:9px;font-weight:700;color:#fff;letter-spacing:1px;text-transform:uppercase;}
+.tbl td{padding:9px 12px;color:var(--g);border-bottom:1px solid var(--g4);}
+.tbl tr:hover td{background:var(--blue4);}
+.sim-btn{display:inline-flex;align-items:center;gap:8px;background:var(--blue);color:#fff;border:none;border-radius:10px;padding:10px 22px;font-size:13px;font-weight:700;cursor:pointer;transition:all .2s;font-family:'Inter';box-shadow:0 4px 12px rgba(29,78,216,0.3);}
+.sim-btn:hover{background:#1e40af;transform:translateY(-2px);}
+.sim-btn.running{background:var(--g2);pointer-events:none;}
+.sim-btn-red{background:var(--red);box-shadow:0 4px 12px rgba(185,28,28,0.3);}
+.sim-btn-red:hover{background:#991b1b;}
+.sim-btn-green{background:var(--green);box-shadow:0 4px 12px rgba(21,128,61,0.3);}
+.sim-btn-green:hover{background:#166534;}
+.foot{margin-top:auto;padding-top:8px;border-top:1px solid var(--g4);display:flex;justify-content:space-between;font-size:10px;color:var(--g2);}
+.nav{position:fixed;bottom:0;left:0;width:100%;display:flex;align-items:center;padding:10px 32px;z-index:100;background:linear-gradient(transparent,rgba(240,244,248,.97));backdrop-filter:blur(10px);}
+.nav .cnt{font-size:11px;color:var(--g);font-weight:700;letter-spacing:1px;min-width:55px;}
+.nav .bar{flex:1;max-width:240px;height:4px;background:var(--g4);border-radius:4px;margin:0 18px;overflow:hidden;}
+.nav .fill{height:100%;border-radius:4px;transition:width .4s;background:linear-gradient(90deg,var(--blue),var(--teal));}
+.nav .bt{display:flex;gap:6px;}
+.nav .b{width:40px;height:40px;border-radius:10px;border:1px solid var(--g4);background:var(--w);color:var(--navy);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;box-shadow:var(--sh);font-weight:700;}
+.nav .b:hover{border-color:var(--blue2);color:var(--blue);background:var(--blue4);}
+@media(max-width:800px){.sl{padding:16px 12px 52px;}.g2,.g3,.g4{grid-template-columns:1fr;}.split{flex-direction:column;}.pipe{flex-direction:column;}.pa{transform:rotate(90deg);}.vs-row{flex-direction:column;}.title-right{display:none !important;}}
+</style>
+</head>
+<body>
+<div class="P" id="P">
+
+<!-- ===== SLIDE 1 — TITRE ===== -->
+<div class="s active" data-s="0">
+  <div class="blob" style="width:500px;height:500px;background:rgba(29,78,216,0.06);top:-120px;right:-80px;"></div>
+  <div class="blob" style="width:350px;height:350px;background:rgba(202,138,4,0.06);bottom:-100px;left:-60px;animation-delay:3s;"></div>
+  <div class="sl">
+    <div class="top a"><span class="logo"><span class="ld"></span>Club Intelligence Artificielle</span><span class="tag">Conférence 2025</span></div>
+    <div style="flex:1;display:flex;align-items:center;gap:36px;">
+      <div style="flex:1;">
+        <div class="a a1" style="display:inline-flex;align-items:center;gap:6px;background:var(--navy);color:#fff;border-radius:8px;padding:7px 16px;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-bottom:18px;">🛡️ Sécurité & Intelligence Artificielle</div>
+        <div class="a a2" style="width:50px;height:4px;background:linear-gradient(90deg,var(--gold2),var(--blue2));border-radius:3px;margin-bottom:14px;"></div>
+        <h1 class="a a2">Reconnaissance<br>Faciale</h1>
+        <p class="desc a a3" style="font-size:17px;">Comment l'IA peut <b style="color:var(--navy);">reconnaître un visage</b> pour sécuriser l'accès à un établissement — plus fiable qu'un badge, plus rapide qu'un garde.</p>
+        <div class="a a4" style="display:flex;gap:16px;font-size:12px;color:var(--g2);flex-wrap:wrap;">
+          <span>📅 2025 / 2026</span><span>🎓 Club IA</span><span>🏛️ Établissement</span>
+        </div>
+      </div>
+      <div class="title-right" style="flex:0 0 260px;">
+        <div class="a a5" style="border-radius:18px;background:linear-gradient(135deg,var(--navy),var(--navy2));position:relative;overflow:hidden;box-shadow:var(--sh2);animation:float 5s ease-in-out infinite;aspect-ratio:3/4;">
+          <div style="position:absolute;width:100%;height:2px;background:linear-gradient(90deg,transparent,rgba(202,138,4,.7),transparent);animation:scan 3s ease-in-out infinite;box-shadow:0 0 20px rgba(202,138,4,.3);"></div>
+          <div style="position:absolute;top:10px;left:10px;width:22px;height:22px;border-top:3px solid var(--gold2);border-left:3px solid var(--gold2);border-radius:3px 0 0 0;"></div>
+          <div style="position:absolute;top:10px;right:10px;width:22px;height:22px;border-top:3px solid var(--gold2);border-right:3px solid var(--gold2);border-radius:0 3px 0 0;"></div>
+          <div style="position:absolute;bottom:10px;left:10px;width:22px;height:22px;border-bottom:3px solid var(--gold2);border-left:3px solid var(--gold2);border-radius:0 0 0 3px;"></div>
+          <div style="position:absolute;bottom:10px;right:10px;width:22px;height:22px;border-bottom:3px solid var(--gold2);border-right:3px solid var(--gold2);border-radius:0 0 3px 0;"></div>
+          <svg viewBox="0 0 260 347" style="width:100%;height:100%;">
+            <ellipse cx="130" cy="140" rx="55" ry="68" fill="none" stroke="rgba(59,130,246,.15)" stroke-width="1.5"/>
+            <ellipse cx="105" cy="125" rx="13" ry="8" fill="none" stroke="rgba(59,130,246,.3)" stroke-width="1"><animate attributeName="ry" values="8;1;8" dur="5s" repeatCount="indefinite" begin="2.5s"/></ellipse>
+            <ellipse cx="155" cy="125" rx="13" ry="8" fill="none" stroke="rgba(59,130,246,.3)" stroke-width="1"><animate attributeName="ry" values="8;1;8" dur="5s" repeatCount="indefinite" begin="2.5s"/></ellipse>
+            <circle cx="105" cy="125" r="3.5" fill="rgba(59,130,246,.5)"><animate attributeName="opacity" values=".3;1;.3" dur="2.5s" repeatCount="indefinite"/></circle>
+            <circle cx="155" cy="125" r="3.5" fill="rgba(59,130,246,.5)"><animate attributeName="opacity" values=".3;1;.3" dur="2.8s" repeatCount="indefinite"/></circle>
+            <circle cx="130" cy="148" r="3" fill="rgba(59,130,246,.3)"/>
+            <path d="M115 172 Q130 184 145 172" fill="none" stroke="rgba(59,130,246,.2)" stroke-width="1.5"/>
+            <circle cx="85" cy="108" r="2.5" fill="rgba(202,138,4,.5)"><animate attributeName="r" values="2;3.5;2" dur="3s" repeatCount="indefinite"/></circle>
+            <circle cx="175" cy="108" r="2.5" fill="rgba(202,138,4,.5)"><animate attributeName="r" values="2;3.5;2" dur="3s" repeatCount="indefinite" begin=".5s"/></circle>
+            <rect x="25" y="260" width="210" height="55" rx="10" fill="rgba(0,0,0,.4)"/>
+            <text x="42" y="280" fill="rgba(202,138,4,.7)" font-size="9" font-family="Inter" font-weight="600">ID: CMD-0472</text>
+            <circle cx="42" cy="296" r="4.5" fill="#22c55e"><animate attributeName="r" values="3.5;5.5;3.5" dur="2s" repeatCount="indefinite"/></circle>
+            <text x="54" y="300" fill="#22c55e" font-size="10" font-family="Inter" font-weight="800">ACCÈS AUTORISÉ</text>
+          </svg>
+        </div>
+      </div>
+    </div>
+    <div class="foot a a6"><span>Confidentiel</span><span>← → pour naviguer</span></div>
+  </div>
+</div>
+
+<!-- ===== SLIDE 2 — LE PROBLÈME ===== -->
+<div class="s" data-s="1">
+  <div class="sl">
+    <div class="top"><span class="logo"><span class="ld"></span>Club IA</span><span class="tag">Le Problème</span></div>
+    <div class="body">
+      <div class="lbl a"><span class="num">01</span>Le Problème</div>
+      <h2 class="a a1">Badge, Code ou Visage ?</h2>
+      <p class="desc a a2">Comparons les 3 méthodes d'accès — et voyons pourquoi le visage est la seule solution fiable pour un établissement.</p>
+      <div class="g3 a a3">
+        <div class="c" style="border-top:4px solid var(--red);text-align:center;"><div style="font-size:40px;margin-bottom:8px;">🪪</div><h3 style="color:var(--red);">Badge / Carte</h3><p>Peut être <b>volé, copié ou prêté</b>. N'importe qui avec le badge passe.</p><div style="margin-top:8px;font-size:24px;">❌</div></div>
+        <div class="c" style="border-top:4px solid var(--red);text-align:center;"><div style="font-size:40px;margin-bottom:8px;">🔢</div><h3 style="color:var(--red);">Code PIN</h3><p>Peut être <b>espionné ou partagé</b>. Un code ne prouve pas l'identité.</p><div style="margin-top:8px;font-size:24px;">❌</div></div>
+        <div class="c" style="border-top:4px solid var(--green);text-align:center;"><div style="font-size:40px;margin-bottom:8px;">🧑</div><h3 style="color:var(--green);">Le Visage</h3><p><b>Unique et impossible à voler.</b> Vous ÊTES votre clé d'accès.</p><div style="margin-top:8px;font-size:24px;">✅</div></div>
+      </div>
+      <div class="n nb a a5"><p>💡 <b>L'idée :</b> Au lieu de vérifier ce que vous <i>possédez</i> (badge) ou <i>savez</i> (code), on vérifie <b>qui vous êtes</b>. Votre visage ne peut pas être oublié, perdu ou prêté.</p></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== SLIDE 3 — UTILITÉ DÉTAILLÉE ===== -->
+<div class="s" data-s="2">
+  <div class="blob" style="width:380px;height:380px;background:rgba(124,58,237,0.05);bottom:0;right:10%;"></div>
+  <div class="sl">
+    <div class="top"><span class="logo"><span class="ld"></span>Club IA</span><span class="tag">02 — Pourquoi ?</span></div>
+    <div class="body">
+      <div class="lbl a"><span class="num">02</span>Utilité</div>
+      <h2 class="a a1">Pourquoi la Reconnaissance Faciale ?</h2>
+      <p class="desc a a2">Les <b>5 piliers</b> qui rendent cette technologie indispensable pour un établissement.</p>
+      <div class="split a a3">
+        <div class="spl">
+          <div class="diag" style="padding:8px;">
+            <svg viewBox="0 0 440 300" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <linearGradient id="grd1" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#1d4ed8" stop-opacity=".15"/><stop offset="100%" stop-color="#7c3aed" stop-opacity=".08"/></linearGradient>
+              </defs>
+              <!-- Central hexagon -->
+              <polygon points="220,50 290,90 290,170 220,210 150,170 150,90" fill="url(#grd1)" stroke="#1d4ed8" stroke-width="2"/>
+              <text x="220" y="120" text-anchor="middle" fill="#0f1d3a" font-size="10" font-weight="800" font-family="Inter">RECONNAISSANCE</text>
+              <text x="220" y="135" text-anchor="middle" fill="#0f1d3a" font-size="10" font-weight="800" font-family="Inter">FACIALE</text>
+              <text x="220" y="155" text-anchor="middle" fill="#3b82f6" font-size="22">🛡️</text>
+              <!-- Branch 1: Sécurité -->
+              <line x1="150" y1="100" x2="60" y2="50" stroke="#dc2626" stroke-width="1.5" stroke-dasharray="4,3"><animate attributeName="stroke-dashoffset" values="14;0" dur="2s" repeatCount="indefinite"/></line>
+              <rect x="10" y="25" width="100" height="50" rx="10" fill="#fee2e2" stroke="#dc2626" stroke-width="1.5"/>
+              <text x="60" y="47" text-anchor="middle" fill="#b91c1c" font-size="8" font-weight="700" font-family="Inter">🔒 SÉCURITÉ</text>
+              <text x="60" y="62" text-anchor="middle" fill="#b91c1c" font-size="7" font-family="Inter">Zéro intrusion</text>
+              <!-- Branch 2: Rapidité -->
+              <line x1="290" y1="100" x2="370" y2="50" stroke="#15803d" stroke-width="1.5" stroke-dasharray="4,3"><animate attributeName="stroke-dashoffset" values="14;0" dur="2s" repeatCount="indefinite" begin=".4s"/></line>
+              <rect x="330" y="25" width="100" height="50" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.5"/>
+              <text x="380" y="47" text-anchor="middle" fill="#15803d" font-size="8" font-weight="700" font-family="Inter">⚡ RAPIDITÉ</text>
+              <text x="380" y="62" text-anchor="middle" fill="#15803d" font-size="7" font-family="Inter">&lt; 0.2 seconde</text>
+              <!-- Branch 3: Traçabilité -->
+              <line x1="150" y1="170" x2="50" y2="230" stroke="#7c3aed" stroke-width="1.5" stroke-dasharray="4,3"><animate attributeName="stroke-dashoffset" values="14;0" dur="2s" repeatCount="indefinite" begin=".8s"/></line>
+              <rect x="0" y="210" width="105" height="50" rx="10" fill="#ede9fe" stroke="#7c3aed" stroke-width="1.5"/>
+              <text x="52" y="232" text-anchor="middle" fill="#7c3aed" font-size="8" font-weight="700" font-family="Inter">📋 TRAÇABILITÉ</text>
+              <text x="52" y="247" text-anchor="middle" fill="#7c3aed" font-size="7" font-family="Inter">Log automatique</text>
+              <!-- Branch 4: Économie -->
+              <line x1="290" y1="170" x2="380" y2="230" stroke="#ca8a04" stroke-width="1.5" stroke-dasharray="4,3"><animate attributeName="stroke-dashoffset" values="14;0" dur="2s" repeatCount="indefinite" begin="1.2s"/></line>
+              <rect x="335" y="210" width="100" height="50" rx="10" fill="#fef9c3" stroke="#ca8a04" stroke-width="1.5"/>
+              <text x="385" y="232" text-anchor="middle" fill="#a16207" font-size="8" font-weight="700" font-family="Inter">💰 ÉCONOMIE</text>
+              <text x="385" y="247" text-anchor="middle" fill="#a16207" font-size="7" font-family="Inter">Coût réduit</text>
+              <!-- Branch 5: Autonomie -->
+              <line x1="220" y1="210" x2="220" y2="270" stroke="#0f766e" stroke-width="1.5" stroke-dasharray="4,3"><animate attributeName="stroke-dashoffset" values="14;0" dur="2s" repeatCount="indefinite" begin="1.6s"/></line>
+              <rect x="168" y="270" width="105" height="28" rx="8" fill="#ccfbf1" stroke="#0f766e" stroke-width="1.5"/>
+              <text x="220" y="289" text-anchor="middle" fill="#0f766e" font-size="8" font-weight="700" font-family="Inter">🌐 100% HORS-LIGNE</text>
+            </svg>
+          </div>
+        </div>
+        <div class="spr">
+          <div class="c" style="margin-bottom:8px;border-left:4px solid var(--red);padding:14px;"><h3>🔒 Sécurité maximale</h3><p>Impossible de falsifier un visage. Détection anti-fraude intégrée (photos, masques, deepfakes).</p></div>
+          <div class="c" style="margin-bottom:8px;border-left:4px solid var(--green);padding:14px;"><h3>⚡ Accès instantané</h3><p>Identification en <b>0.2s</b> — pas d'attente, pas de file. Flux rapide même aux heures de pointe.</p></div>
+          <div class="c" style="margin-bottom:8px;border-left:4px solid var(--purple);padding:14px;"><h3>📋 Traçabilité complète</h3><p>Chaque passage enregistré : <b>qui, quand, où</b>. Journal d'audit automatique.</p></div>
+          <div class="c" style="margin-bottom:8px;border-left:4px solid var(--gold2);padding:14px;"><h3>💰 Réduction des coûts</h3><p>Moins de gardes nécessaires, <b>zéro badge à remplacer</b>, maintenance minimale.</p></div>
+          <div class="c" style="border-left:4px solid var(--teal);padding:14px;"><h3>🌐 Fonctionne hors-ligne</h3><p>Tout est local — <b>aucune dépendance réseau</b>. Idéal pour les zones isolées.</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== SLIDE 4 — SIMULATION AUTORISÉ ===== -->
+<div class="s" data-s="3">
+  <div class="blob" style="width:400px;height:400px;background:rgba(21,128,61,0.05);top:5%;right:5%;"></div>
+  <div class="sl">
+    <div class="top"><span class="logo"><span class="ld"></span>Club IA</span><span class="tag">🟢 Simulation — Accès Autorisé</span></div>
+    <div class="body">
+      <div class="lbl a"><span class="num">▶</span>Démonstration</div>
+      <h2 class="a a1">Simulation : Personne Autorisée</h2>
+      <p class="desc a a2">Cliquez sur <b>Lancer</b> pour voir le système identifier un militaire enregistré.</p>
+      <div class="a a3" style="display:flex;gap:14px;align-items:flex-start;">
+        <div class="diag" style="flex:1;padding:0;overflow:hidden;border-radius:16px;">
+          <svg id="sim1" viewBox="0 0 900 400" xmlns="http://www.w3.org/2000/svg" style="display:block;background:linear-gradient(180deg,#e8f0fe 0%,#d4e4f7 40%,#8b9bb5 40%,#6b7a94 100%);">
+            <rect x="0" y="168" width="900" height="252" fill="#6b7a94"/>
+            <rect x="520" y="30" width="360" height="290" rx="6" fill="#3a4a6b" stroke="#2a3a5b" stroke-width="2"/>
+            <rect x="540" y="50" width="80" height="50" rx="4" fill="#4a6080"/><rect x="640" y="50" width="80" height="50" rx="4" fill="#4a6080"/><rect x="740" y="50" width="80" height="50" rx="4" fill="#4a6080"/>
+            <rect x="540" y="120" width="80" height="50" rx="4" fill="#4a6080"/><rect x="640" y="120" width="80" height="50" rx="4" fill="#4a6080"/><rect x="740" y="120" width="80" height="50" rx="4" fill="#4a6080"/>
+            <text x="700" y="25" text-anchor="middle" fill="#2a3a5b" font-size="12" font-weight="800" font-family="Inter" letter-spacing="2">ÉTABLISSEMENT</text>
+            <rect x="430" y="180" width="20" height="160" fill="#2a3a5b"/><rect x="550" y="180" width="20" height="160" fill="#2a3a5b"/>
+            <rect x="430" y="172" width="140" height="16" rx="3" fill="#1f2d4a"/>
+            <text x="500" y="183" text-anchor="middle" fill="#ca8a04" font-size="7" font-weight="700" font-family="Inter">POINT D'ACCÈS A-1</text>
+            <g id="gate1"><rect x="450" y="188" width="4" height="152" fill="#4a5a7b" rx="1"/><rect x="462" y="188" width="4" height="152" fill="#4a5a7b" rx="1"/><rect x="474" y="188" width="4" height="152" fill="#4a5a7b" rx="1"/><rect x="486" y="188" width="4" height="152" fill="#4a5a7b" rx="1"/><rect x="498" y="188" width="4" height="152" fill="#4a5a7b" rx="1"/><rect x="510" y="188" width="4" height="152" fill="#4a5a7b" rx="1"/><rect x="522" y="188" width="4" height="152" fill="#4a5a7b" rx="1"/><rect x="534" y="188" width="4" height="152" fill="#4a5a7b" rx="1"/></g>
+            <rect x="410" y="195" width="30" height="22" rx="4" fill="#1a2340"/><circle cx="425" cy="206" r="6" fill="#2a3a5b" stroke="#3b82f6" stroke-width="1.5"/><circle cx="425" cy="206" r="2.5" fill="#3b82f6" id="camLed1"><animate attributeName="fill" values="#3b82f6;#60a5fa;#3b82f6" dur="1.5s" repeatCount="indefinite"/></circle>
+            <g id="person1" style="opacity:0;"><rect x="260" y="245" width="50" height="70" rx="6" fill="#2d5a27"/><rect x="265" y="248" width="40" height="15" rx="2" fill="#1a3f16"/><circle cx="285" cy="225" r="24" fill="#d4a574"/><ellipse cx="285" cy="208" rx="26" ry="8" fill="#2d5a27"/><rect x="262" y="204" width="46" height="8" rx="3" fill="#2d5a27"/><ellipse cx="276" cy="224" rx="4" ry="3" fill="#fff"/><circle cx="276" cy="224" r="2" fill="#1a2340"/><ellipse cx="294" cy="224" rx="4" ry="3" fill="#fff"/><circle cx="294" cy="224" r="2" fill="#1a2340"/><path d="M278 236 Q285 240 292 236" fill="none" stroke="#8b6944" stroke-width="1.5"/><rect x="268" y="315" width="14" height="25" rx="3" fill="#1a3f16"/><rect x="288" y="315" width="14" height="25" rx="3" fill="#1a3f16"/><rect x="266" y="336" width="18" height="8" rx="3" fill="#1a2340"/><rect x="286" y="336" width="18" height="8" rx="3" fill="#1a2340"/></g>
+            <rect id="beam1" x="350" y="200" width="80" height="3" rx="1.5" fill="#3b82f6" opacity="0"/>
+            <rect id="scanBox1" x="258" y="198" width="54" height="58" rx="4" fill="none" stroke="#3b82f6" stroke-width="2" stroke-dasharray="6,4" opacity="0"/>
+            <rect x="30" y="355" width="260" height="36" rx="10" fill="rgba(255,255,255,0.9)" stroke="#e2e8f0" stroke-width="1"/>
+            <text id="status1" x="50" y="378" fill="#64748b" font-size="12" font-weight="600" font-family="Inter">⏳ En attente...</text>
+            <g id="result1" style="opacity:0;"><rect x="580" y="355" width="200" height="36" rx="10" fill="#dcfce7" stroke="#22c55e" stroke-width="2"/><text x="680" y="378" text-anchor="middle" fill="#15803d" font-size="12" font-weight="800" font-family="Inter">✅ ACCÈS AUTORISÉ</text></g>
+            <g id="data1" style="opacity:0;"><rect x="30" y="30" width="200" height="120" rx="10" fill="rgba(15,29,58,0.9)"/><text x="45" y="52" fill="#3b82f6" font-size="9" font-weight="700" font-family="Inter">📊 ANALYSE EN COURS</text><text id="d1a" x="45" y="70" fill="#94a3b8" font-size="8" font-family="Inter">Détection visage...</text><text id="d1b" x="45" y="84" fill="#94a3b8" font-size="8" font-family="Inter"></text><text id="d1c" x="45" y="98" fill="#94a3b8" font-size="8" font-family="Inter"></text><text id="d1d" x="45" y="112" fill="#94a3b8" font-size="8" font-family="Inter"></text><text id="d1e" x="45" y="130" fill="#22c55e" font-size="10" font-weight="700" font-family="Inter"></text></g>
+          </svg>
+        </div>
+        <div style="flex:0 0 210px;">
+          <button class="sim-btn sim-btn-green" id="btn1" onclick="runSim1()" style="width:100%;justify-content:center;margin-bottom:10px;">▶ Lancer la simulation</button>
+          <div class="c" style="padding:14px;margin-bottom:8px;"><h3 style="font-size:12px;">📋 Étapes</h3><div id="steps1" style="margin-top:6px;font-size:10px;color:var(--g2);line-height:1.8;"><div id="s1s1">⬜ 1. Personne s'approche</div><div id="s1s2">⬜ 2. Caméra détecte</div><div id="s1s3">⬜ 3. Scan & analyse IA</div><div id="s1s4">⬜ 4. Vérification identité</div><div id="s1s5">⬜ 5. Décision d'accès</div><div id="s1s6">⬜ 6. Ouverture portail</div></div></div>
+          <div class="n ngn" style="margin-top:0;"><p><b>Scénario :</b> Un commandant enregistré se présente au portail A-1.</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== SLIDE 5 — SIMULATION REFUSÉ ===== -->
+<div class="s" data-s="4">
+  <div class="blob" style="width:400px;height:400px;background:rgba(185,28,28,0.05);top:5%;left:5%;"></div>
+  <div class="sl">
+    <div class="top"><span class="logo"><span class="ld"></span>Club IA</span><span class="tag">🔴 Simulation — Accès Refusé</span></div>
+    <div class="body">
+      <div class="lbl a"><span class="num">▶</span>Intrusion</div>
+      <h2 class="a a1">Simulation : Personne Non-Autorisée</h2>
+      <p class="desc a a2">Que se passe-t-il quand un <b>inconnu</b> tente d'accéder ?</p>
+      <div class="a a3" style="display:flex;gap:14px;align-items:flex-start;">
+        <div class="diag" style="flex:1;padding:0;overflow:hidden;border-radius:16px;">
+          <svg id="sim2" viewBox="0 0 900 400" xmlns="http://www.w3.org/2000/svg" style="display:block;background:linear-gradient(180deg,#e8f0fe 0%,#d4e4f7 40%,#8b9bb5 40%,#6b7a94 100%);">
+            <rect x="0" y="168" width="900" height="252" fill="#6b7a94"/>
+            <rect x="520" y="30" width="360" height="290" rx="6" fill="#3a4a6b" stroke="#2a3a5b" stroke-width="2"/>
+            <rect x="540" y="50" width="80" height="50" rx="4" fill="#4a6080"/><rect x="640" y="50" width="80" height="50" rx="4" fill="#4a6080"/><rect x="740" y="50" width="80" height="50" rx="4" fill="#4a6080"/>
+            <rect x="540" y="120" width="80" height="50" rx="4" fill="#4a6080"/><rect x="640" y="120" width="80" height="50" rx="4" fill="#4a6080"/><rect x="740" y="120" width="80" height="50" rx="4" fill="#4a6080"/>
+            <text x="700" y="25" text-anchor="middle" fill="#2a3a5b" font-size="12" font-weight="800" font-family="Inter" letter-spacing="2">ÉTABLISSEMENT</text>
+            <rect x="430" y="180" width="20" height="160" fill="#2a3a5b"/><rect x="550" y="180" width="20" height="160" fill="#2a3a5b"/>
+            <rect x="430" y="172" width="140" height="16" rx="3" fill="#1f2d4a"/>
+            <text x="500" y="183" text-anchor="middle" fill="#ca8a04" font-size="7" font-weight="700" font-family="Inter">POINT D'ACCÈS A-1</text>
+            <g id="gate2"><rect x="450" y="188" width="4" height="152" fill="#4a5a7b" rx="1"/><rect x="462" y="188" width="4" height="152" fill="#4a5a7b" rx="1"/><rect x="474" y="188" width="4" height="152" fill="#4a5a7b" rx="1"/><rect x="486" y="188" width="4" height="152" fill="#4a5a7b" rx="1"/><rect x="498" y="188" width="4" height="152" fill="#4a5a7b" rx="1"/><rect x="510" y="188" width="4" height="152" fill="#4a5a7b" rx="1"/><rect x="522" y="188" width="4" height="152" fill="#4a5a7b" rx="1"/><rect x="534" y="188" width="4" height="152" fill="#4a5a7b" rx="1"/></g>
+            <rect x="410" y="195" width="30" height="22" rx="4" fill="#1a2340"/><circle cx="425" cy="206" r="6" fill="#2a3a5b" stroke="#3b82f6" stroke-width="1.5"/><circle cx="425" cy="206" r="2.5" fill="#3b82f6"/>
+            <g id="person2" style="opacity:0;"><rect x="260" y="245" width="50" height="70" rx="6" fill="#2a2a2a"/><circle cx="285" cy="225" r="24" fill="#c4956a"/><rect x="264" y="210" width="42" height="10" rx="3" fill="#1a1a1a"/><ellipse cx="276" cy="224" rx="4" ry="3" fill="#fff"/><circle cx="276" cy="224" r="2" fill="#1a2340"/><ellipse cx="294" cy="224" rx="4" ry="3" fill="#fff"/><circle cx="294" cy="224" r="2" fill="#1a2340"/><path d="M278 236 Q285 232 292 236" fill="none" stroke="#8b6944" stroke-width="1.5"/><rect x="268" y="315" width="14" height="25" rx="3" fill="#1a1a1a"/><rect x="288" y="315" width="14" height="25" rx="3" fill="#1a1a1a"/><rect x="266" y="336" width="18" height="8" rx="3" fill="#333"/><rect x="286" y="336" width="18" height="8" rx="3" fill="#333"/></g>
+            <rect id="beam2" x="350" y="200" width="80" height="3" rx="1.5" fill="#dc2626" opacity="0"/>
+            <rect id="scanBox2" x="258" y="198" width="54" height="58" rx="4" fill="none" stroke="#dc2626" stroke-width="2" stroke-dasharray="6,4" opacity="0"/>
+            <rect x="30" y="355" width="260" height="36" rx="10" fill="rgba(255,255,255,.9)" stroke="#e2e8f0" stroke-width="1"/>
+            <text id="status2" x="50" y="378" fill="#64748b" font-size="12" font-weight="600" font-family="Inter">⏳ En attente...</text>
+            <g id="result2" style="opacity:0;"><rect x="580" y="355" width="200" height="36" rx="10" fill="#fee2e2" stroke="#dc2626" stroke-width="2"/><text x="680" y="378" text-anchor="middle" fill="#b91c1c" font-size="12" font-weight="800" font-family="Inter">🚨 ACCÈS REFUSÉ</text></g>
+            <rect id="alarm2" x="0" y="0" width="900" height="400" fill="rgba(220,38,38,0)"/>
+            <g id="data2" style="opacity:0;"><rect x="30" y="30" width="200" height="120" rx="10" fill="rgba(15,29,58,.9)"/><text x="45" y="52" fill="#dc2626" font-size="9" font-weight="700" font-family="Inter">🔴 ANALYSE EN COURS</text><text id="d2a" x="45" y="70" fill="#94a3b8" font-size="8" font-family="Inter">Détection visage...</text><text id="d2b" x="45" y="84" fill="#94a3b8" font-size="8" font-family="Inter"></text><text id="d2c" x="45" y="98" fill="#94a3b8" font-size="8" font-family="Inter"></text><text id="d2d" x="45" y="112" fill="#94a3b8" font-size="8" font-family="Inter"></text><text id="d2e" x="45" y="130" fill="#dc2626" font-size="10" font-weight="700" font-family="Inter"></text></g>
+          </svg>
+        </div>
+        <div style="flex:0 0 210px;">
+          <button class="sim-btn sim-btn-red" id="btn2" onclick="runSim2()" style="width:100%;justify-content:center;margin-bottom:10px;">▶ Lancer la simulation</button>
+          <div class="c" style="padding:14px;margin-bottom:8px;"><h3 style="font-size:12px;">📋 Étapes</h3><div id="steps2" style="margin-top:6px;font-size:10px;color:var(--g2);line-height:1.8;"><div id="s2s1">⬜ 1. Inconnu s'approche</div><div id="s2s2">⬜ 2. Caméra détecte</div><div id="s2s3">⬜ 3. Scan & analyse IA</div><div id="s2s4">⬜ 4. Recherche en base</div><div id="s2s5">⬜ 5. Aucune correspondance</div><div id="s2s6">⬜ 6. ALERTE SÉCURITÉ</div></div></div>
+          <div class="n nr" style="margin-top:0;"><p><b>Scénario :</b> Un individu non enregistré tente d'accéder au portail.</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== SLIDE 6 — COMMENT ÇA MARCHE ===== -->
+<div class="s" data-s="5">
+  <div class="sl">
+    <div class="top"><span class="logo"><span class="ld"></span>Club IA</span><span class="tag">03 — Fonctionnement</span></div>
+    <div class="body">
+      <div class="lbl a"><span class="num">03</span>Comment ça Marche</div>
+      <h2 class="a a1">Que voit l'Intelligence Artificielle ?</h2>
+      <p class="desc a a2">L'IA mesure <b>des dizaines de distances uniques</b> entre vos traits — comme un code-barres biologique.</p>
+      <div class="split">
+        <div class="spl">
+          <div class="diag a a3">
+            <svg viewBox="0 0 420 270" xmlns="http://www.w3.org/2000/svg">
+              <text x="210" y="16" text-anchor="middle" fill="#0f1d3a" font-size="10" font-weight="800" letter-spacing="1">POINTS DE REPÈRE (LANDMARKS)</text>
+              <ellipse cx="170" cy="145" rx="78" ry="92" fill="#eff6ff" stroke="#3b82f6" stroke-width="1.5" stroke-dasharray="6,4"/>
+              <ellipse cx="142" cy="126" rx="18" ry="9" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.5"/>
+              <ellipse cx="198" cy="126" rx="18" ry="9" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.5"/>
+              <circle cx="142" cy="126" r="5" fill="#1d4ed8" opacity=".6"/><circle cx="198" cy="126" r="5" fill="#1d4ed8" opacity=".6"/>
+              <circle cx="170" cy="155" r="6" fill="#dcfce7" stroke="#15803d" stroke-width="1.5"/>
+              <ellipse cx="170" cy="185" rx="24" ry="9" fill="#fef9c3" stroke="#ca8a04" stroke-width="1.5"/>
+              <circle cx="122" cy="126" r="3.5" fill="#dc2626"><animate attributeName="r" values="3;5;3" dur="2s" repeatCount="indefinite"/></circle>
+              <circle cx="162" cy="126" r="3.5" fill="#dc2626"><animate attributeName="r" values="3;5;3" dur="2s" repeatCount="indefinite" begin=".3s"/></circle>
+              <circle cx="178" cy="126" r="3.5" fill="#dc2626"><animate attributeName="r" values="3;5;3" dur="2s" repeatCount="indefinite" begin=".5s"/></circle>
+              <circle cx="218" cy="126" r="3.5" fill="#dc2626"><animate attributeName="r" values="3;5;3" dur="2s" repeatCount="indefinite" begin=".7s"/></circle>
+              <circle cx="170" cy="148" r="3" fill="#dc2626"><animate attributeName="r" values="2.5;4;2.5" dur="2s" repeatCount="indefinite" begin="1s"/></circle>
+              <circle cx="146" cy="185" r="3" fill="#dc2626"/><circle cx="194" cy="185" r="3" fill="#dc2626"/>
+              <circle cx="95" cy="135" r="2.5" fill="#dc2626"/><circle cx="245" cy="135" r="2.5" fill="#dc2626"/>
+              <circle cx="170" cy="92" r="2.5" fill="#dc2626"/><circle cx="115" cy="218" r="2.5" fill="#dc2626"/><circle cx="225" cy="218" r="2.5" fill="#dc2626"/>
+              <line x1="142" y1="126" x2="198" y2="126" stroke="#f59e0b" stroke-width="2" stroke-dasharray="5,3"><animate attributeName="stroke-dashoffset" values="16;0" dur="1.5s" repeatCount="indefinite"/></line>
+              <text x="170" y="119" text-anchor="middle" fill="#f59e0b" font-size="7" font-weight="700">distance inter-oculaire</text>
+              <rect x="275" y="50" width="135" height="28" rx="8" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1"/><text x="342" y="68" text-anchor="middle" fill="#1d4ed8" font-size="8" font-weight="700">👁️ Position des yeux</text>
+              <line x1="218" y1="126" x2="275" y2="64" stroke="#1d4ed8" stroke-width="1" stroke-dasharray="3,3" opacity=".4"/>
+              <rect x="275" y="92" width="135" height="28" rx="8" fill="#dcfce7" stroke="#15803d" stroke-width="1"/><text x="342" y="110" text-anchor="middle" fill="#15803d" font-size="8" font-weight="700">👃 Forme du nez</text>
+              <rect x="275" y="134" width="135" height="28" rx="8" fill="#fef9c3" stroke="#ca8a04" stroke-width="1"/><text x="342" y="152" text-anchor="middle" fill="#a16207" font-size="8" font-weight="700">👄 Contour bouche</text>
+              <rect x="275" y="176" width="135" height="28" rx="8" fill="#fee2e2" stroke="#dc2626" stroke-width="1"/><text x="342" y="194" text-anchor="middle" fill="#b91c1c" font-size="8" font-weight="700">🔴 68+ points mesurés</text>
+              <text x="210" y="262" text-anchor="middle" fill="#94a3b8" font-size="8">Ces mesures créent un "code numérique" unique pour chaque visage</text>
+            </svg>
+          </div>
+        </div>
+        <div class="spr">
+          <div class="c a a3" style="margin-bottom:8px;border-left:4px solid var(--blue);padding:14px;"><div class="ci ci-b">🧬</div><h3>Unique comme l'ADN</h3><p>La combinaison de toutes ces mesures est <b>unique pour chaque personne</b> — même les jumeaux.</p></div>
+          <div class="c a a4" style="margin-bottom:8px;border-left:4px solid var(--purple);padding:14px;"><div class="ci ci-p">😎</div><h3>Fonctionne même avec…</h3><p>Lunettes, barbe, coiffure différente. L'IA se concentre sur la <b>structure osseuse</b>.</p></div>
+          <div class="c a a5" style="border-left:4px solid var(--teal);padding:14px;"><div class="ci ci-t">⚡</div><h3>Ultra-rapide</h3><p><b>68 points</b> → code <b>512 chiffres</b> → comparé en <b>10 ms</b>.</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== SLIDE 7 — BESOINS DU MODÈLE IA ===== -->
+<div class="s" data-s="6">
+  <div class="blob" style="width:400px;height:400px;background:rgba(194,65,12,0.05);top:0;right:0;"></div>
+  <div class="sl">
+    <div class="top"><span class="logo"><span class="ld"></span>Club IA</span><span class="tag">04 — Besoins du Modèle</span></div>
+    <div class="body">
+      <div class="lbl a"><span class="num">04</span>Besoins du Modèle</div>
+      <h2 class="a a1">De quoi a besoin le modèle IA ?</h2>
+      <p class="desc a a2">Un modèle performant repose sur <b>3 piliers</b> : données d'entraînement, puissance de calcul et algorithmes optimisés.</p>
+      <div class="split">
+        <div class="spl">
+          <div class="diag a a3" style="padding:10px;">
+            <svg viewBox="0 0 460 310" xmlns="http://www.w3.org/2000/svg">
+              <text x="230" y="18" text-anchor="middle" fill="#0f1d3a" font-size="11" font-weight="800" font-family="Inter" letter-spacing="1">PIPELINE D'ENTRAÎNEMENT DU MODÈLE</text>
+              <!-- Phase 1: Data -->
+              <rect x="15" y="40" width="130" height="100" rx="12" fill="#eff6ff" stroke="#1d4ed8" stroke-width="2"/>
+              <text x="80" y="60" text-anchor="middle" fill="#1d4ed8" font-size="9" font-weight="800" font-family="Inter">📸 DONNÉES</text>
+              <rect x="28" y="70" width="26" height="20" rx="3" fill="#dbeafe" stroke="#3b82f6" stroke-width="1"/><text x="41" y="84" text-anchor="middle" fill="#1d4ed8" font-size="7">😀</text>
+              <rect x="58" y="70" width="26" height="20" rx="3" fill="#dbeafe" stroke="#3b82f6" stroke-width="1"/><text x="71" y="84" text-anchor="middle" fill="#1d4ed8" font-size="7">😐</text>
+              <rect x="88" y="70" width="26" height="20" rx="3" fill="#dbeafe" stroke="#3b82f6" stroke-width="1"/><text x="101" y="84" text-anchor="middle" fill="#1d4ed8" font-size="7">😊</text>
+              <rect x="28" y="95" width="26" height="20" rx="3" fill="#dbeafe" stroke="#3b82f6" stroke-width="1"/><text x="41" y="109" text-anchor="middle" fill="#1d4ed8" font-size="7">🌙</text>
+              <rect x="58" y="95" width="26" height="20" rx="3" fill="#dbeafe" stroke="#3b82f6" stroke-width="1"/><text x="71" y="109" text-anchor="middle" fill="#1d4ed8" font-size="7">☀️</text>
+              <rect x="88" y="95" width="26" height="20" rx="3" fill="#dbeafe" stroke="#3b82f6" stroke-width="1"/><text x="101" y="109" text-anchor="middle" fill="#1d4ed8" font-size="7">💡</text>
+              <text x="80" y="130" text-anchor="middle" fill="#64748b" font-size="7" font-family="Inter">Milliers d'images / personne</text>
+              <!-- Arrow 1 -->
+              <line x1="148" y1="90" x2="170" y2="90" stroke="#3b82f6" stroke-width="2"><animate attributeName="stroke-dashoffset" values="10;0" dur="1s" repeatCount="indefinite"/></line>
+              <polygon points="168,85 178,90 168,95" fill="#3b82f6"/>
+              <!-- Phase 2: Training -->
+              <rect x="180" y="40" width="130" height="100" rx="12" fill="#ede9fe" stroke="#7c3aed" stroke-width="2"/>
+              <text x="245" y="60" text-anchor="middle" fill="#7c3aed" font-size="9" font-weight="800" font-family="Inter">🧠 ENTRAÎNEMENT</text>
+              <!-- Neural net mini diagram -->
+              <circle cx="205" cy="78" r="4" fill="#7c3aed" opacity=".4"/><circle cx="205" cy="92" r="4" fill="#7c3aed" opacity=".4"/><circle cx="205" cy="106" r="4" fill="#7c3aed" opacity=".4"/>
+              <circle cx="230" cy="82" r="4" fill="#7c3aed" opacity=".6"/><circle cx="230" cy="98" r="4" fill="#7c3aed" opacity=".6"/>
+              <circle cx="255" cy="78" r="4" fill="#7c3aed" opacity=".4"/><circle cx="255" cy="92" r="4" fill="#7c3aed" opacity=".4"/><circle cx="255" cy="106" r="4" fill="#7c3aed" opacity=".4"/>
+              <circle cx="280" cy="90" r="5" fill="#7c3aed" opacity=".8"/>
+              <line x1="209" y1="78" x2="226" y2="82" stroke="#7c3aed" stroke-width=".7" opacity=".5"/><line x1="209" y1="92" x2="226" y2="82" stroke="#7c3aed" stroke-width=".7" opacity=".5"/><line x1="209" y1="92" x2="226" y2="98" stroke="#7c3aed" stroke-width=".7" opacity=".5"/><line x1="209" y1="106" x2="226" y2="98" stroke="#7c3aed" stroke-width=".7" opacity=".5"/>
+              <line x1="234" y1="82" x2="251" y2="78" stroke="#7c3aed" stroke-width=".7" opacity=".5"/><line x1="234" y1="82" x2="251" y2="92" stroke="#7c3aed" stroke-width=".7" opacity=".5"/><line x1="234" y1="98" x2="251" y2="92" stroke="#7c3aed" stroke-width=".7" opacity=".5"/><line x1="234" y1="98" x2="251" y2="106" stroke="#7c3aed" stroke-width=".7" opacity=".5"/>
+              <line x1="259" y1="78" x2="275" y2="90" stroke="#7c3aed" stroke-width=".7" opacity=".5"/><line x1="259" y1="92" x2="275" y2="90" stroke="#7c3aed" stroke-width=".7" opacity=".5"/><line x1="259" y1="106" x2="275" y2="90" stroke="#7c3aed" stroke-width=".7" opacity=".5"/>
+              <text x="245" y="130" text-anchor="middle" fill="#64748b" font-size="7" font-family="Inter">CNN / ArcFace / FaceNet</text>
+              <!-- Arrow 2 -->
+              <line x1="313" y1="90" x2="335" y2="90" stroke="#7c3aed" stroke-width="2"><animate attributeName="stroke-dashoffset" values="10;0" dur="1s" repeatCount="indefinite" begin=".3s"/></line>
+              <polygon points="333,85 343,90 333,95" fill="#7c3aed"/>
+              <!-- Phase 3: Model -->
+              <rect x="345" y="40" width="100" height="100" rx="12" fill="#dcfce7" stroke="#15803d" stroke-width="2"/>
+              <text x="395" y="60" text-anchor="middle" fill="#15803d" font-size="9" font-weight="800" font-family="Inter">✅ MODÈLE</text>
+              <rect x="362" y="72" width="66" height="50" rx="8" fill="#bbf7d0" stroke="#22c55e" stroke-width="1.5"/>
+              <text x="395" y="92" text-anchor="middle" fill="#15803d" font-size="16">🧠</text>
+              <text x="395" y="112" text-anchor="middle" fill="#15803d" font-size="7" font-weight="700" font-family="Inter">face_model.pt</text>
+              <text x="395" y="130" text-anchor="middle" fill="#64748b" font-size="7" font-family="Inter">Prêt au déploiement</text>
+              <!-- Requirements boxes below -->
+              <rect x="15" y="165" width="210" height="62" rx="10" fill="#fff" stroke="#e2e8f0" stroke-width="1.5"/>
+              <text x="30" y="183" fill="#c2410c" font-size="9" font-weight="700" font-family="Inter">📊 Données nécessaires</text>
+              <text x="30" y="198" fill="#64748b" font-size="8" font-family="Inter">• 50-200 photos par personne</text>
+              <text x="30" y="211" fill="#64748b" font-size="8" font-family="Inter">• Angles variés, éclairages différents</text>
+              <text x="30" y="224" fill="#64748b" font-size="8" font-family="Inter">• Avec/sans lunettes, casquette</text>
+              <rect x="240" y="165" width="210" height="62" rx="10" fill="#fff" stroke="#e2e8f0" stroke-width="1.5"/>
+              <text x="255" y="183" fill="#7c3aed" font-size="9" font-weight="700" font-family="Inter">⚙️ Matériel d'entraînement</text>
+              <text x="255" y="198" fill="#64748b" font-size="8" font-family="Inter">• GPU NVIDIA (RTX 3060+ ou Cloud)</text>
+              <text x="255" y="211" fill="#64748b" font-size="8" font-family="Inter">• 16 Go RAM minimum</text>
+              <text x="255" y="224" fill="#64748b" font-size="8" font-family="Inter">• Temps: ~2-8h d'entraînement</text>
+              <rect x="15" y="240" width="435" height="55" rx="10" fill="#fff" stroke="#e2e8f0" stroke-width="1.5"/>
+              <text x="30" y="258" fill="#0f766e" font-size="9" font-weight="700" font-family="Inter">🔬 Modèles & Frameworks utilisés</text>
+              <text x="30" y="275" fill="#64748b" font-size="8" font-family="Inter">FaceNet (Google) — ArcFace (InsightFace) — dlib — MTCNN — OpenCV — PyTorch / TensorFlow</text>
+              <text x="30" y="288" fill="#94a3b8" font-size="7" font-family="Inter">Modèles pré-entraînés sur des millions de visages → fine-tuning sur nos données militaires</text>
+            </svg>
+          </div>
+        </div>
+        <div class="spr">
+          <div class="c a a3" style="margin-bottom:8px;border-left:4px solid var(--orange);padding:14px;"><div class="ci ci-o">📸</div><h3>Données d'entraînement</h3><p><b>50 à 200 photos</b> par personne sous différents angles, éclairages et expressions. Plus = meilleur.</p></div>
+          <div class="c a a4" style="margin-bottom:8px;border-left:4px solid var(--purple);padding:14px;"><div class="ci ci-p">🧠</div><h3>Réseau de neurones (CNN)</h3><p>Un <b>réseau convolutif profond</b> apprend à extraire les caractéristiques uniques de chaque visage.</p></div>
+          <div class="c a a5" style="margin-bottom:8px;border-left:4px solid var(--blue);padding:14px;"><div class="ci ci-b">🎯</div><h3>Fonction de perte (ArcFace)</h3><p>Entraîne le modèle à <b>maximiser la distance</b> entre les identités différentes et la <b>minimiser</b> pour la même personne.</p></div>
+          <div class="c a a6" style="border-left:4px solid var(--green);padding:14px;"><div class="ci ci-gn">✅</div><h3>Validation & tests</h3><p>Le modèle est testé sur des visages <b>jamais vus</b> pour garantir la généralisation. Objectif : <b>99%+ de précision</b>.</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== SLIDE 8 — SYSTÈME EMBARQUÉ ===== -->
+<div class="s" data-s="7">
+  <div class="blob" style="width:450px;height:450px;background:rgba(15,118,110,0.05);bottom:0;left:5%;"></div>
+  <div class="sl">
+    <div class="top"><span class="logo"><span class="ld"></span>Club IA</span><span class="tag">05 — Embarqué + IA</span></div>
+    <div class="body">
+      <div class="lbl a"><span class="num">05</span>Système Embarqué</div>
+      <h2 class="a a1">IA Embarquée : Le Cerveau au Portail</h2>
+      <p class="desc a a2">Le modèle IA tourne <b>directement sur un mini-ordinateur</b> fixé au portail — aucun cloud, aucun internet nécessaire.</p>
+      <div class="split">
+        <div class="spl">
+          <div class="diag a a3" style="padding:10px;">
+            <svg viewBox="0 0 480 320" xmlns="http://www.w3.org/2000/svg">
+              <text x="240" y="18" text-anchor="middle" fill="#0f1d3a" font-size="11" font-weight="800" font-family="Inter" letter-spacing="1">ARCHITECTURE EMBARQUÉE COMPLÈTE</text>
+              <!-- Camera module -->
+              <rect x="15" y="50" width="90" height="75" rx="10" fill="#0f1d3a" stroke="#1b2e5c" stroke-width="2"/>
+              <circle cx="60" cy="80" r="20" fill="#1b2e5c" stroke="#3b82f6" stroke-width="2"/>
+              <circle cx="60" cy="80" r="10" fill="#2a3a5b" stroke="#60a5fa" stroke-width="1.5"/>
+              <circle cx="60" cy="80" r="4" fill="#3b82f6"><animate attributeName="r" values="3;5;3" dur="2s" repeatCount="indefinite"/></circle>
+              <circle cx="90" cy="57" r="3" fill="#22c55e"><animate attributeName="opacity" values="1;.3;1" dur="1.5s" repeatCount="indefinite"/></circle>
+              <text x="60" y="117" text-anchor="middle" fill="#0f1d3a" font-size="8" font-weight="700" font-family="Inter">CAMÉRA IR+RGB</text>
+              <text x="60" y="128" text-anchor="middle" fill="#94a3b8" font-size="6" font-family="Inter">1080p / 30fps / IR nuit</text>
+              <!-- Arrow cam to jetson -->
+              <line x1="108" y1="85" x2="148" y2="85" stroke="#3b82f6" stroke-width="2" stroke-dasharray="6,3"><animate attributeName="stroke-dashoffset" values="18;0" dur="1.5s" repeatCount="indefinite"/></line>
+              <text x="128" y="78" text-anchor="middle" fill="#3b82f6" font-size="6" font-weight="700" font-family="Inter">USB3</text>
+              <!-- NVIDIA Jetson board -->
+              <rect x="150" y="38" width="180" height="108" rx="12" fill="#1a1a2e" stroke="#22c55e" stroke-width="2"/>
+              <rect x="160" y="48" width="160" height="15" rx="4" fill="#22c55e" opacity=".15"/>
+              <text x="240" y="59" text-anchor="middle" fill="#22c55e" font-size="8" font-weight="800" font-family="Inter" letter-spacing="1">NVIDIA JETSON ORIN NANO</text>
+              <!-- GPU chip -->
+              <rect x="170" y="72" width="50" height="35" rx="4" fill="#2d2d4e" stroke="#7c3aed" stroke-width="1.5"/>
+              <text x="195" y="86" text-anchor="middle" fill="#7c3aed" font-size="6" font-weight="700" font-family="Inter">GPU</text>
+              <text x="195" y="96" text-anchor="middle" fill="#7c3aed" font-size="6" font-family="Inter">1024 CUDA</text>
+              <!-- CPU chip -->
+              <rect x="228" y="72" width="44" height="35" rx="4" fill="#2d2d4e" stroke="#3b82f6" stroke-width="1.5"/>
+              <text x="250" y="86" text-anchor="middle" fill="#3b82f6" font-size="6" font-weight="700" font-family="Inter">CPU</text>
+              <text x="250" y="96" text-anchor="middle" fill="#3b82f6" font-size="6" font-family="Inter">6-core</text>
+              <!-- RAM -->
+              <rect x="280" y="72" width="40" height="35" rx="4" fill="#2d2d4e" stroke="#f59e0b" stroke-width="1.5"/>
+              <text x="300" y="86" text-anchor="middle" fill="#f59e0b" font-size="6" font-weight="700" font-family="Inter">RAM</text>
+              <text x="300" y="96" text-anchor="middle" fill="#f59e0b" font-size="6" font-family="Inter">8 Go</text>
+              <!-- Model file -->
+              <rect x="168" y="115" width="70" height="22" rx="5" fill="#dcfce7" stroke="#22c55e" stroke-width="1"/>
+              <text x="203" y="130" text-anchor="middle" fill="#15803d" font-size="7" font-weight="700" font-family="Inter">🧠 Modèle IA</text>
+              <!-- TensorRT -->
+              <rect x="248" y="115" width="72" height="22" rx="5" fill="#ede9fe" stroke="#7c3aed" stroke-width="1"/>
+              <text x="284" y="130" text-anchor="middle" fill="#7c3aed" font-size="7" font-weight="700" font-family="Inter">⚡ TensorRT</text>
+              <!-- Size info -->
+              <text x="240" y="155" text-anchor="middle" fill="#94a3b8" font-size="7" font-family="Inter">Taille: 70×45mm — 7W — Silencieux</text>
+              <!-- Arrow jetson to relay -->
+              <line x1="333" y1="85" x2="370" y2="85" stroke="#22c55e" stroke-width="2" stroke-dasharray="6,3"><animate attributeName="stroke-dashoffset" values="18;0" dur="1.5s" repeatCount="indefinite" begin=".5s"/></line>
+              <text x="352" y="78" text-anchor="middle" fill="#22c55e" font-size="6" font-weight="700" font-family="Inter">GPIO</text>
+              <!-- Relay / Gate controller -->
+              <rect x="372" y="55" width="95" height="65" rx="10" fill="#fef9c3" stroke="#ca8a04" stroke-width="2"/>
+              <text x="420" y="73" text-anchor="middle" fill="#a16207" font-size="8" font-weight="700" font-family="Inter">🔌 RELAIS</text>
+              <rect x="385" y="80" width="18" height="12" rx="2" fill="#ca8a04" opacity=".4"/><rect x="408" y="80" width="18" height="12" rx="2" fill="#ca8a04" opacity=".4"/><rect x="431" y="80" width="18" height="12" rx="2" fill="#ca8a04" opacity=".4"/>
+              <text x="420" y="110" text-anchor="middle" fill="#a16207" font-size="7" font-family="Inter">Contrôle portail</text>
+              <!-- Arrow relay to gate -->
+              <line x1="420" y1="125" x2="420" y2="170" stroke="#ca8a04" stroke-width="2" stroke-dasharray="6,3"><animate attributeName="stroke-dashoffset" values="18;0" dur="1.5s" repeatCount="indefinite" begin="1s"/></line>
+              <!-- Gate icon -->
+              <rect x="385" y="175" width="70" height="45" rx="8" fill="#6b7a94" stroke="#4a5a7b" stroke-width="2"/>
+              <rect x="392" y="182" width="4" height="30" rx="1" fill="#8b9bb5"/><rect x="400" y="182" width="4" height="30" rx="1" fill="#8b9bb5"/><rect x="408" y="182" width="4" height="30" rx="1" fill="#8b9bb5"/><rect x="416" y="182" width="4" height="30" rx="1" fill="#8b9bb5"/><rect x="424" y="182" width="4" height="30" rx="1" fill="#8b9bb5"/><rect x="432" y="182" width="4" height="30" rx="1" fill="#8b9bb5"/><rect x="440" y="182" width="4" height="30" rx="1" fill="#8b9bb5"/>
+              <text x="420" y="235" text-anchor="middle" fill="#0f1d3a" font-size="8" font-weight="700" font-family="Inter">🚪 PORTAIL</text>
+              <!-- Screen / display -->
+              <rect x="15" y="175" width="90" height="60" rx="8" fill="#0f1d3a" stroke="#3b82f6" stroke-width="1.5"/>
+              <rect x="22" y="182" width="76" height="36" rx="4" fill="#1b2e5c"/>
+              <text x="60" y="200" text-anchor="middle" fill="#22c55e" font-size="7" font-weight="700" font-family="Inter">✅ AUTORISÉ</text>
+              <text x="60" y="212" text-anchor="middle" fill="#60a5fa" font-size="6" font-family="Inter">CMD-0472</text>
+              <circle cx="60" cy="228" r="3" fill="#94a3b8"/>
+              <text x="60" y="248" text-anchor="middle" fill="#0f1d3a" font-size="8" font-weight="700" font-family="Inter">📺 ÉCRAN LCD</text>
+              <line x1="108" y1="205" x2="148" y2="120" stroke="#3b82f6" stroke-width="1" stroke-dasharray="3,3" opacity=".4"/>
+              <!-- Buzzer -->
+              <rect x="152" y="185" width="70" height="40" rx="8" fill="#fee2e2" stroke="#dc2626" stroke-width="1.5"/>
+              <text x="187" y="205" text-anchor="middle" fill="#b91c1c" font-size="7" font-weight="700" font-family="Inter">🔊 BUZZER</text>
+              <text x="187" y="216" text-anchor="middle" fill="#b91c1c" font-size="6" font-family="Inter">Alerte sonore</text>
+              <line x1="187" y1="182" x2="220" y2="150" stroke="#dc2626" stroke-width="1" stroke-dasharray="3,3" opacity=".4"/>
+              <!-- IR LED module -->
+              <rect x="245" y="185" width="80" height="40" rx="8" fill="#ede9fe" stroke="#7c3aed" stroke-width="1.5"/>
+              <text x="285" y="202" text-anchor="middle" fill="#7c3aed" font-size="7" font-weight="700" font-family="Inter">💡 LED IR</text>
+              <text x="285" y="215" text-anchor="middle" fill="#7c3aed" font-size="6" font-family="Inter">Vision nocturne</text>
+              <!-- Labels -->
+              <rect x="15" y="270" width="450" height="40" rx="10" fill="rgba(15,29,58,.06)" stroke="#e2e8f0" stroke-width="1"/>
+              <text x="30" y="288" fill="#0f1d3a" font-size="8" font-weight="700" font-family="Inter">💰 Coût total estimé : ~300-500€</text>
+              <text x="30" y="302" fill="#64748b" font-size="7" font-family="Inter">Jetson ~200€ + Caméra IR ~50€ + Écran ~30€ + Relais ~15€ + Boîtier ~20€ + Câblage ~15€</text>
+            </svg>
+          </div>
+        </div>
+        <div class="spr">
+          <div class="c a a3" style="margin-bottom:8px;border-left:4px solid var(--green);padding:14px;"><div class="ci ci-gn">🖥️</div><h3>NVIDIA Jetson Orin Nano</h3><p>Mini-PC avec <b>GPU intégré</b> — exécute le modèle IA en temps réel à <b>30 FPS</b>. Taille d'une carte de crédit.</p></div>
+          <div class="c a a4" style="margin-bottom:8px;border-left:4px solid var(--blue);padding:14px;"><div class="ci ci-b">📷</div><h3>Caméra IR + RGB</h3><p>Capture en <b>infrarouge + couleur</b>. Fonctionne <b>de jour comme de nuit</b>, même dans l'obscurité totale.</p></div>
+          <div class="c a a5" style="margin-bottom:8px;border-left:4px solid var(--purple);padding:14px;"><div class="ci ci-p">⚡</div><h3>TensorRT (Optimisation)</h3><p>Le modèle est <b>compilé et optimisé</b> pour le GPU embarqué → inférence <b>5x plus rapide</b> qu'en Python natif.</p></div>
+          <div class="c a a6" style="border-left:4px solid var(--gold2);padding:14px;"><div class="ci ci-g">🔌</div><h3>GPIO → Relais → Portail</h3><p>Le Jetson envoie un <b>signal électrique</b> au relais qui <b>commande l'ouverture</b> du portail. Tout automatique.</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== SLIDE 9 — FLUX LOGICIEL EMBARQUÉ ===== -->
+<div class="s" data-s="8">
+  <div class="sl">
+    <div class="top"><span class="logo"><span class="ld"></span>Club IA</span><span class="tag">06 — Flux Logiciel</span></div>
+    <div class="body">
+      <div class="lbl a"><span class="num">06</span>Flux Logiciel</div>
+      <h2 class="a a1">Du Pixel à la Décision : Code Embarqué</h2>
+      <p class="desc a a2">Voici le chemin complet qu'une image parcourt dans le système embarqué, du capteur au portail.</p>
+      <div class="pipe a a3">
+        <div class="pb" style="border-top:4px solid var(--navy);"><div class="pe">📷</div><div class="pt">1. Capture</div><div class="pd">OpenCV lit le flux caméra<br><code style="font-size:8px;color:var(--blue);">cv2.VideoCapture()</code></div></div>
+        <div class="pa">▶</div>
+        <div class="pb" style="border-top:4px solid var(--blue);"><div class="pe">🔍</div><div class="pt">2. Détection</div><div class="pd">MTCNN / RetinaFace localise les visages<br><code style="font-size:8px;color:var(--blue);">detect_faces(frame)</code></div></div>
+        <div class="pa">▶</div>
+        <div class="pb" style="border-top:4px solid var(--purple);"><div class="pe">🧬</div><div class="pt">3. Embedding</div><div class="pd">ArcFace génère le vecteur 512-d<br><code style="font-size:8px;color:var(--purple);">get_embedding(face)</code></div></div>
+        <div class="pa">▶</div>
+        <div class="pb" style="border-top:4px solid var(--teal);"><div class="pe">📊</div><div class="pt">4. Matching</div><div class="pd">Distance cosinus vs base<br><code style="font-size:8px;color:var(--teal);">cosine_sim()</code></div></div>
+        <div class="pa">▶</div>
+        <div class="pb" style="border-top:4px solid var(--green);"><div class="pe">🚪</div><div class="pt">5. Action</div><div class="pd">GPIO ouvre ou alerte<br><code style="font-size:8px;color:var(--green);">GPIO.output()</code></div></div>
+      </div>
+      <div class="g3 a a5" style="margin-top:14px;">
+        <div class="c" style="display:flex;gap:12px;align-items:center;padding:14px;"><div style="font-size:28px;">🛡️</div><div><h3>Anti-spoofing</h3><p>Détecte photos, masques et vidéos via <b>analyse de texture IR + clignement</b>.</p></div></div>
+        <div class="c" style="display:flex;gap:12px;align-items:center;padding:14px;"><div style="font-size:28px;">📋</div><div><h3>Log local</h3><p>SQLite enregistre chaque passage : <b>horodatage, ID, score, photo</b>.</p></div></div>
+        <div class="c" style="display:flex;gap:12px;align-items:center;padding:14px;"><div style="font-size:28px;">🔄</div><div><h3>Mise à jour</h3><p>Nouveau personnel ? On ajoute ses photos via <b>USB ou réseau local</b> sécurisé.</p></div></div>
+      </div>
+      <div class="n np a a6"><p>🐍 <b>Stack logiciel :</b> Python 3.10 + PyTorch + OpenCV + TensorRT + SQLite — le tout optimisé pour NVIDIA Jetson avec JetPack SDK.</p></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== SLIDE 10 — HUMAIN VS IA ===== -->
+<div class="s" data-s="9">
+  <div class="sl">
+    <div class="top"><span class="logo"><span class="ld"></span>Club IA</span><span class="tag">07 — Performance</span></div>
+    <div class="body">
+      <div class="lbl a"><span class="num">07</span>Performance</div>
+      <h2 class="a a1">Humain vs Intelligence Artificielle</h2>
+      <p class="desc a a2">L'IA ne remplace pas le garde — elle élimine ses erreurs involontaires.</p>
+      <div class="stats a a3">
+        <div class="st"><div class="sv" style="color:var(--blue);">99.8%</div><div class="sl2">Précision IA</div></div>
+        <div class="st"><div class="sv" style="color:var(--green);">0.2s</div><div class="sl2">Temps réponse</div></div>
+        <div class="st"><div class="sv" style="color:var(--gold2);">0.001%</div><div class="sl2">Fausse acceptation</div></div>
+        <div class="st"><div class="sv" style="color:var(--purple);">24/7</div><div class="sl2">Sans pause</div></div>
+      </div>
+      <div class="vs-row a a4">
+        <div class="vs-box vs-bad"><div class="vi">👮</div><h3>Garde Humain</h3><p>Fatigue, distraction, erreurs après des heures. 1 vérification à la fois.</p><div style="margin-top:8px;font-size:11px;color:var(--red);font-weight:700;">⚠️ 2-5% d'erreurs</div></div>
+        <div style="display:flex;align-items:center;font-size:22px;color:var(--g3);font-weight:900;">VS</div>
+        <div class="vs-box vs-good"><div class="vi">🤖</div><h3>IA + Caméra</h3><p>Constante, infatigable. Fonctionne de nuit, sous la pluie, avec des milliers de visages.</p><div style="margin-top:8px;font-size:11px;color:var(--green);font-weight:700;">✅ 0.002% d'erreurs</div></div>
+      </div>
+      <div class="n ng a a6"><p>⚖️ <b>Complémentarité :</b> L'IA assiste le garde. Le garde reste en poste et intervient si nécessaire. Ensemble = sécurité maximale.</p></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== SLIDE 11 — CAS RÉELS ===== -->
+<div class="s" data-s="10">
+  <div class="sl">
+    <div class="top"><span class="logo"><span class="ld"></span>Club IA</span><span class="tag">08 — Cas Réels</span></div>
+    <div class="body">
+      <div class="lbl a"><span class="num">08</span>Déjà Déployé</div>
+      <h2 class="a a1">Qui utilise cette technologie ?</h2>
+      <p class="desc a a2">Technologie mature utilisée par les plus grandes organisations de sécurité au monde.</p>
+      <div class="g2 a a3">
+        <div class="c" style="display:flex;gap:12px;align-items:center;padding:14px;"><div style="font-size:36px;">✈️</div><div><h3>+200 Aéroports</h3><p>Embarquement par reconnaissance faciale (Dubai, Singapour, Paris CDG).</p></div></div>
+        <div class="c" style="display:flex;gap:12px;align-items:center;padding:14px;"><div style="font-size:36px;">🏛️</div><div><h3>Bases militaires</h3><p>USA, Israël et Chine — biométrie pour les <b>zones les plus sensibles</b>.</p></div></div>
+        <div class="c" style="display:flex;gap:12px;align-items:center;padding:14px;"><div style="font-size:36px;">📱</div><div><h3>Votre téléphone</h3><p><b>Face ID</b> — 30 000 points projetés. Vous l'utilisez chaque jour.</p></div></div>
+        <div class="c" style="display:flex;gap:12px;align-items:center;padding:14px;"><div style="font-size:36px;">🏦</div><div><h3>Banques</h3><p>Vérification d'identité pour transactions sensibles — <b>prévention fraude</b>.</p></div></div>
+      </div>
+      <div class="n nb a a5"><p>🎯 <b>Notre établissement :</b> La technologie est mature. Nous l'adaptons à l'établissement avec un niveau de sécurité <b>encore supérieur</b>.</p></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== SLIDE 12 — COMPARATIF HARDWARE ===== -->
+<div class="s" data-s="11">
+  <div class="sl">
+    <div class="top"><span class="logo"><span class="ld"></span>Club IA</span><span class="tag">09 — Choix Hardware</span></div>
+    <div class="body">
+      <div class="lbl a"><span class="num">09</span>Hardware</div>
+      <h2 class="a a1">Quel matériel embarqué choisir ?</h2>
+      <p class="desc a a2">Comparatif des plateformes embarquées adaptées à la reconnaissance faciale en temps réel.</p>
+      <div class="a a3" style="overflow-x:auto;">
+        <table class="tbl">
+          <thead><tr><th>Plateforme</th><th>GPU/NPU</th><th>RAM</th><th>FPS (face)</th><th>Prix</th><th>Verdict</th></tr></thead>
+          <tbody>
+            <tr><td style="font-weight:700;color:var(--navy);">NVIDIA Jetson Orin Nano</td><td>1024 CUDA cores</td><td>8 Go</td><td style="color:var(--green);font-weight:700;">30+ FPS</td><td>~200€</td><td style="color:var(--green);font-weight:700;">⭐ Recommandé</td></tr>
+            <tr><td style="font-weight:700;color:var(--navy);">Raspberry Pi 5 + Coral TPU</td><td>4 TOPS (Coral)</td><td>8 Go</td><td style="color:var(--gold);font-weight:700;">15-20 FPS</td><td>~120€</td><td style="color:var(--gold);font-weight:700;">✅ Budget</td></tr>
+            <tr><td style="font-weight:700;color:var(--navy);">Jetson Xavier NX</td><td>384 CUDA + 48 Tensor</td><td>8 Go</td><td style="color:var(--green);font-weight:700;">45+ FPS</td><td>~400€</td><td style="color:var(--blue);font-weight:700;">💎 Premium</td></tr>
+            <tr><td style="font-weight:700;color:var(--navy);">Raspberry Pi 4 (seul)</td><td>Aucun</td><td>4 Go</td><td style="color:var(--red);font-weight:700;">2-5 FPS</td><td>~60€</td><td style="color:var(--red);font-weight:700;">❌ Trop lent</td></tr>
+            <tr><td style="font-weight:700;color:var(--navy);">Orange Pi 5 + RK NPU</td><td>6 TOPS NPU</td><td>8 Go</td><td style="color:var(--gold);font-weight:700;">20-25 FPS</td><td>~100€</td><td style="color:var(--gold);font-weight:700;">✅ Alternative</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="g3 a a5" style="margin-top:14px;">
+        <div class="c" style="padding:14px;border-top:3px solid var(--green);text-align:center;"><div style="font-size:30px;margin-bottom:6px;">🏆</div><h3>Notre choix : Jetson Orin Nano</h3><p>Meilleur rapport <b>performance/prix</b> pour l'inférence IA temps réel.</p></div>
+        <div class="c" style="padding:14px;border-top:3px solid var(--blue);text-align:center;"><div style="font-size:30px;margin-bottom:6px;">🔧</div><h3>Critère clé : GPU embarqué</h3><p>Sans GPU, le modèle est trop lent. Un <b>accélérateur IA</b> est indispensable.</p></div>
+        <div class="c" style="padding:14px;border-top:3px solid var(--purple);text-align:center;"><div style="font-size:30px;margin-bottom:6px;">🌡️</div><h3>Passif = silencieux</h3><p>Le Jetson fonctionne <b>sans ventilateur</b> — adapté à l'extérieur.</p></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== SLIDE 13 — ÉTHIQUE ===== -->
+<div class="s" data-s="12">
+  <div class="sl">
+    <div class="top"><span class="logo"><span class="ld"></span>Club IA</span><span class="tag">10 — Éthique</span></div>
+    <div class="body">
+      <div class="lbl a"><span class="num">10</span>Responsabilité</div>
+      <h2 class="a a1">Protection & Éthique</h2>
+      <p class="desc a a2">Un système biométrique militaire exige un cadre éthique rigoureux.</p>
+      <div class="g2 a a3">
+        <div class="c" style="border-left:4px solid var(--red);padding:14px;"><div class="ci ci-r">🔒</div><h3>Données ultra-protégées</h3><p>Codes faciaux <b>chiffrés AES-256</b>, stockés sur serveur <b>isolé sans internet</b>.</p></div>
+        <div class="c" style="border-left:4px solid var(--purple);padding:14px;"><div class="ci ci-p">👤</div><h3>Consentement</h3><p>Chaque personne est <b>informée et donne son accord</b> avant enregistrement.</p></div>
+        <div class="c" style="border-left:4px solid var(--blue);padding:14px;"><div class="ci ci-b">👁️</div><h3>Supervision humaine</h3><p>L'IA assiste mais <b>ne remplace jamais</b> le jugement humain.</p></div>
+        <div class="c" style="border-left:4px solid var(--gold2);padding:14px;"><div class="ci ci-g">📊</div><h3>Audits réguliers</h3><p>Tests de <b>fiabilité et d'équité</b> planifiés pour tous les profils.</p></div>
+      </div>
+      <div class="n nr a a5"><p>⚖️ <b>Principe :</b> La technologie sert la sécurité — jamais la surveillance. Identification uniquement aux points d'accès définis.</p></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== SLIDE 14 — CONCLUSION ===== -->
+<div class="s" data-s="13">
+  <div class="blob" style="width:500px;height:500px;background:rgba(29,78,216,0.05);top:-80px;right:-80px;"></div>
+  <div class="sl">
+    <div class="top"><span class="logo"><span class="ld"></span>Club IA</span><span class="tag">Conclusion</span></div>
+    <div class="body">
+      <div class="lbl a">Synthèse</div>
+      <h2 class="a a1">En Résumé</h2>
+      <div class="g4 a a3" style="margin-bottom:14px;">
+        <div class="c" style="border-top:4px solid var(--blue);text-align:center;padding:14px;"><div style="font-size:30px;margin-bottom:6px;">🎯</div><h3>Ultra-précise</h3><p><b>99.8%</b> de précision</p></div>
+        <div class="c" style="border-top:4px solid var(--gold2);text-align:center;padding:14px;"><div style="font-size:30px;margin-bottom:6px;">⚡</div><h3>Instantanée</h3><p><b>&lt; 0.2 seconde</b></p></div>
+        <div class="c" style="border-top:4px solid var(--green);text-align:center;padding:14px;"><div style="font-size:30px;margin-bottom:6px;">🛡️</div><h3>Infalsifiable</h3><p>IR + 3D + anti-spoof</p></div>
+        <div class="c" style="border-top:4px solid var(--purple);text-align:center;padding:14px;"><div style="font-size:30px;margin-bottom:6px;">🔌</div><h3>Embarquée</h3><p>100% locale, ~400€</p></div>
+      </div>
+      <div class="diag a a4" style="padding:10px;margin-bottom:14px;">
+        <svg viewBox="0 0 800 120" xmlns="http://www.w3.org/2000/svg">
+          <text x="400" y="16" text-anchor="middle" fill="#0f1d3a" font-size="10" font-weight="800" font-family="Inter" letter-spacing="1">FEUILLE DE ROUTE — DÉPLOIEMENT</text>
+          <!-- Phase 1 -->
+          <rect x="20" y="35" width="170" height="50" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="1.5"/>
+          <text x="105" y="55" text-anchor="middle" fill="#1d4ed8" font-size="9" font-weight="800" font-family="Inter">📋 Phase 1 : Pilote</text>
+          <text x="105" y="72" text-anchor="middle" fill="#64748b" font-size="7" font-family="Inter">1 portail test — 3 mois</text>
+          <line x1="193" y1="60" x2="220" y2="60" stroke="#3b82f6" stroke-width="2"><animate attributeName="stroke-dashoffset" values="8;0" dur="1s" repeatCount="indefinite"/></line>
+          <!-- Phase 2 -->
+          <rect x="223" y="35" width="170" height="50" rx="10" fill="#fef9c3" stroke="#ca8a04" stroke-width="1.5"/>
+          <text x="308" y="55" text-anchor="middle" fill="#a16207" font-size="9" font-weight="800" font-family="Inter">📊 Phase 2 : Évaluation</text>
+          <text x="308" y="72" text-anchor="middle" fill="#64748b" font-size="7" font-family="Inter">Mesurer — Ajuster — Valider</text>
+          <line x1="396" y1="60" x2="423" y2="60" stroke="#ca8a04" stroke-width="2"><animate attributeName="stroke-dashoffset" values="8;0" dur="1s" repeatCount="indefinite" begin=".3s"/></line>
+          <!-- Phase 3 -->
+          <rect x="426" y="35" width="170" height="50" rx="10" fill="#dcfce7" stroke="#15803d" stroke-width="1.5"/>
+          <text x="511" y="55" text-anchor="middle" fill="#15803d" font-size="9" font-weight="800" font-family="Inter">🚀 Phase 3 : Déploiement</text>
+          <text x="511" y="72" text-anchor="middle" fill="#64748b" font-size="7" font-family="Inter">Tous les portails — Formation</text>
+          <line x1="599" y1="60" x2="626" y2="60" stroke="#15803d" stroke-width="2"><animate attributeName="stroke-dashoffset" values="8;0" dur="1s" repeatCount="indefinite" begin=".6s"/></line>
+          <!-- Phase 4 -->
+          <rect x="629" y="35" width="150" height="50" rx="10" fill="#ede9fe" stroke="#7c3aed" stroke-width="1.5"/>
+          <text x="704" y="55" text-anchor="middle" fill="#7c3aed" font-size="9" font-weight="800" font-family="Inter">🔄 Phase 4 : Évolution</text>
+          <text x="704" y="72" text-anchor="middle" fill="#64748b" font-size="7" font-family="Inter">Multi-facteur — Extension</text>
+          <!-- Timeline dots -->
+          <circle cx="105" cy="100" r="5" fill="#1d4ed8"/><text x="105" y="115" text-anchor="middle" fill="#64748b" font-size="7" font-family="Inter">Mois 1-3</text>
+          <circle cx="308" cy="100" r="5" fill="#ca8a04"/><text x="308" y="115" text-anchor="middle" fill="#64748b" font-size="7" font-family="Inter">Mois 4-5</text>
+          <circle cx="511" cy="100" r="5" fill="#15803d"/><text x="511" y="115" text-anchor="middle" fill="#64748b" font-size="7" font-family="Inter">Mois 6-9</text>
+          <circle cx="704" cy="100" r="5" fill="#7c3aed"/><text x="704" y="115" text-anchor="middle" fill="#64748b" font-size="7" font-family="Inter">Continu</text>
+          <line x1="110" y1="100" x2="699" y2="100" stroke="#e2e8f0" stroke-width="2"/>
+        </svg>
+      </div>
+      <div class="a a6" style="text-align:center;margin-top:8px;">
+        <div style="font-size:clamp(20px,3vw,34px);font-weight:900;color:var(--navy);">Merci pour votre attention</div>
+        <p style="font-size:14px;color:var(--g);margin-top:4px;">Questions & Discussion 💬</p>
+        <div style="width:70px;height:4px;background:linear-gradient(90deg,var(--gold2),var(--blue2));border-radius:3px;margin:12px auto 0;"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<div class="nav">
+  <span class="cnt" id="C">01 / 14</span>
+  <div class="bar"><div class="fill" id="F" style="width:7.14%"></div></div>
+  <div class="bt">
+    <button class="b" onclick="go(-1)">◀</button>
+    <button class="b" onclick="go(1)">▶</button>
+  </div>
+</div>
+
+<script>
+let c=0;const ss=document.querySelectorAll('.s'),t=ss.length;
+function show(n){ss.forEach((s,i)=>{s.classList.remove('active');if(i===n){s.classList.add('active');s.querySelectorAll('[class*="a"]').forEach(el=>{el.style.animation='none';el.offsetHeight;el.style.animation='';});}});document.getElementById('C').textContent=String(n+1).padStart(2,'0')+' / '+String(t).padStart(2,'0');document.getElementById('F').style.width=((n+1)/t*100)+'%';}
+function go(d){const n=c+d;if(n>=0&&n<t){c=n;show(c);}}
+document.addEventListener('keydown',e=>{if(e.key==='ArrowRight'||e.key===' '){e.preventDefault();go(1);}if(e.key==='ArrowLeft'){e.preventDefault();go(-1);}});
+let tx=0;document.addEventListener('touchstart',e=>{tx=e.touches[0].clientX;});document.addEventListener('touchend',e=>{const d=e.changedTouches[0].clientX-tx;if(d<-50)go(1);if(d>50)go(-1);});
+
+// === SIMULATION 1 ===
+let sim1Running=false;
+function runSim1(){
+  if(sim1Running)return;sim1Running=true;
+  const btn=document.getElementById('btn1');btn.classList.add('running');btn.textContent='⏳ En cours...';
+  const p=document.getElementById('person1'),b=document.getElementById('beam1'),sb=document.getElementById('scanBox1'),st=document.getElementById('status1'),r=document.getElementById('result1'),g=document.getElementById('gate1'),d=document.getElementById('data1');
+  p.style.opacity='0';p.style.transform='translateX(-60px)';b.setAttribute('opacity','0');sb.setAttribute('opacity','0');r.style.opacity='0';d.style.opacity='0';g.style.transform='';
+  ['s1s1','s1s2','s1s3','s1s4','s1s5','s1s6'].forEach(id=>{const el=document.getElementById(id);el.innerHTML=el.innerHTML.replace(/[✅🔄]/g,'⬜');el.style.color='';el.style.fontWeight='';});
+  ['d1a','d1b','d1c','d1d','d1e'].forEach(id=>document.getElementById(id).textContent='');document.getElementById('d1a').textContent='Détection visage...';
+  st.textContent='⏳ En attente...';st.setAttribute('fill','#64748b');
+  function step(id,txt,clr){const el=document.getElementById(id);el.innerHTML=txt;el.style.color=clr||'#1d4ed8';el.style.fontWeight='600';}
+  setTimeout(()=>{p.style.transition='opacity .8s,transform 1.2s';p.style.opacity='1';p.style.transform='translateX(0)';st.textContent='👤 Personne détectée';step('s1s1','✅ 1. Personne s\'approche');},500);
+  setTimeout(()=>{sb.setAttribute('opacity','1');st.textContent='📷 Visage détecté';step('s1s2','✅ 2. Caméra détecte');d.style.transition='opacity .4s';d.style.opacity='1';},2200);
+  setTimeout(()=>{b.setAttribute('opacity','1');b.style.animation='scanBeam 1.5s ease-in-out 2';st.textContent='🧠 Analyse IA...';step('s1s3','🔄 3. Scan & analyse IA','#7c3aed');document.getElementById('d1a').textContent='✅ Visage détecté';document.getElementById('d1b').textContent='⏳ 68 landmarks...';},3500);
+  setTimeout(()=>{step('s1s3','✅ 3. Scan & analyse IA');step('s1s4','🔄 4. Vérification','#0f766e');st.textContent='🔎 Comparaison base...';document.getElementById('d1b').textContent='✅ 68 landmarks';document.getElementById('d1c').textContent='⏳ Embedding 512-d...';},5500);
+  setTimeout(()=>{step('s1s4','✅ 4. Vérification');step('s1s5','✅ 5. Match trouvé !','#15803d');st.textContent='✅ CMD-0472 confirmé';st.setAttribute('fill','#15803d');document.getElementById('d1c').textContent='✅ Embedding comparé';document.getElementById('d1d').textContent='✅ Match: CMD-0472 (99.7%)';document.getElementById('d1e').textContent='🟢 CONFIRMÉ';b.setAttribute('opacity','0');sb.setAttribute('stroke','#22c55e');},7200);
+  setTimeout(()=>{step('s1s6','✅ 6. Portail OUVERT','#15803d');r.style.transition='opacity .5s';r.style.opacity='1';g.style.transition='transform 1s';g.style.transformOrigin='450px 264px';g.style.transform='scaleX(0)';st.textContent='🚪 PORTAIL OUVERT';},8800);
+  setTimeout(()=>{btn.classList.remove('running');btn.textContent='🔄 Relancer';sim1Running=false;g.style.transition='transform 1s';g.style.transform='scaleX(1)';},12000);
+}
+
+// === SIMULATION 2 ===
+let sim2Running=false;
+function runSim2(){
+  if(sim2Running)return;sim2Running=true;
+  const btn=document.getElementById('btn2');btn.classList.add('running');btn.textContent='⏳ En cours...';
+  const p=document.getElementById('person2'),b=document.getElementById('beam2'),sb=document.getElementById('scanBox2'),st=document.getElementById('status2'),r=document.getElementById('result2'),al=document.getElementById('alarm2'),d=document.getElementById('data2');
+  p.style.opacity='0';p.style.transform='translateX(-60px)';b.setAttribute('opacity','0');sb.setAttribute('opacity','0');r.style.opacity='0';al.setAttribute('fill','rgba(220,38,38,0)');d.style.opacity='0';
+  ['s2s1','s2s2','s2s3','s2s4','s2s5','s2s6'].forEach(id=>{const el=document.getElementById(id);el.innerHTML=el.innerHTML.replace(/[✅🔄🚨❌]/g,'⬜');el.style.color='';el.style.fontWeight='';});
+  ['d2a','d2b','d2c','d2d','d2e'].forEach(id=>document.getElementById(id).textContent='');document.getElementById('d2a').textContent='Détection visage...';
+  st.textContent='⏳ En attente...';st.setAttribute('fill','#64748b');
+  function step(id,txt,clr){const el=document.getElementById(id);el.innerHTML=txt;el.style.color=clr||'#1d4ed8';el.style.fontWeight='600';}
+  setTimeout(()=>{p.style.transition='opacity .8s,transform 1.2s';p.style.opacity='1';p.style.transform='translateX(0)';st.textContent='👤 Personne détectée';step('s2s1','✅ 1. Inconnu s\'approche');},500);
+  setTimeout(()=>{sb.setAttribute('opacity','1');st.textContent='📷 Visage détecté';step('s2s2','✅ 2. Caméra détecte');d.style.transition='opacity .4s';d.style.opacity='1';},2200);
+  setTimeout(()=>{b.setAttribute('opacity','1');b.style.animation='scanBeam 1.5s ease-in-out 2';st.textContent='🧠 Analyse IA...';step('s2s3','🔄 3. Scan & analyse IA','#7c3aed');document.getElementById('d2a').textContent='✅ Visage détecté';document.getElementById('d2b').textContent='⏳ Landmarks...';},3500);
+  setTimeout(()=>{step('s2s3','✅ 3. Scan & analyse IA');step('s2s4','🔄 4. Recherche en base','#c2410c');st.textContent='🔎 Recherche base...';document.getElementById('d2b').textContent='✅ 68 landmarks';document.getElementById('d2c').textContent='⏳ Comparaison...';},5500);
+  setTimeout(()=>{step('s2s4','✅ 4. Recherche en base');step('s2s5','❌ 5. AUCUN match','#b91c1c');st.textContent='⚠️ Identité inconnue';st.setAttribute('fill','#b91c1c');document.getElementById('d2c').textContent='✅ Embedding comparé';document.getElementById('d2d').textContent='❌ Aucun match';document.getElementById('d2e').textContent='🔴 INCONNU';b.setAttribute('opacity','0');sb.setAttribute('stroke','#dc2626');},7200);
+  setTimeout(()=>{step('s2s6','🚨 6. ALERTE','#b91c1c');r.style.transition='opacity .3s';r.style.opacity='1';st.textContent='🚨 INTRUSION — Garde alerté';let f=0;const iv=setInterval(()=>{al.setAttribute('fill',f%2===0?'rgba(220,38,38,0.12)':'rgba(220,38,38,0)');f++;if(f>8)clearInterval(iv);},300);},8800);
+  setTimeout(()=>{btn.classList.remove('running');btn.textContent='🔄 Relancer';sim2Running=false;},12000);
+}
+</script>
+</body>
+</html>
