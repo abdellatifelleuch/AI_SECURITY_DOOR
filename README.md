@@ -1,0 +1,2 @@
+🎤 Présentation interactive sur la Reconnaissance Faciale
+Présentation HTML/CSS/JS entièrement responsive et animée, conçue pour illustrer l'application de la reconnaissance faciale dans le contrôle d'accès d'un établissement. Elle couvre le fonctionnement de l'IA biométrique, le pipeline technique (détection → landmarks → embedding → comparaison), les enjeux éthiques, ainsi que deux simulations interactives d'accès autorisé et d'intrusion. 14 slides fluides, sans dépendance externe, prêtes à être ouvertes directement dans un navigateur.
